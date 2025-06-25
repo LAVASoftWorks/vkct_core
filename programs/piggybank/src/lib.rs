@@ -13,7 +13,7 @@ use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
 use solana_security_txt::security_txt;
 
 // Note: put here the piggy bank's public key
-declare_id!("PASTE_THE_ACCOUNT_HERE");
+declare_id!("VaU1t11111111111111111111111111111111111111");
 
 #[program]
 pub mod piggybank {
