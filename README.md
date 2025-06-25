@@ -1,0 +1,175 @@
+
+# Piggy bank setup
+
+This needs to be done in a peak Ubuntu instance (24+).
+
+The Piggy bank contract will be used to validate fund withdrawals by NFT owners.
+If the signer of the withdrawal isn't the NFT owner, then the transaction will be rejected.
+
+This contract will be shared with all the collections you make. There's no need to have
+more than one per project.
+
+**Important:** the steps to build and deploy the contract should be separated from the
+contract logic to dodge compatibility issues.
+
+## Preinits
+
+**Important:** from the shell perspective, we're working on the account's home (E.G. `/home/user`).
+
+Install development tools:
+
+```shell
+sudo apt-get install -y build-essential pkg-config libudev-dev llvm \
+                        libclang-dev protobuf-compiler libssl-dev
+```
+
+Now install Node.js if not already done:
+
+```shell
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+# Restart SSH session before continuing
+
+nvm install stable --lts
+# Restart SSH session again
+
+```
+
+Now install the Solana toolset
+
+```shell
+# Install rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+# Restart SSH session before continuing 
+rustc --version
+#> rustc 1.87.0 (17067e9ac 2025-05-09)
+
+# Install the Solana CLI
+sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+# Restart SSH session before continuing
+solana --version
+#> solana-cli 2.2.18 (src:8392f753; feat:3073396398, client:Agave)
+
+# Install AVM
+cargo install --git https://github.com/coral-xyz/anchor avm --force
+avm --version
+#> avm 0.31.1
+
+# Install anchor
+avm install latest
+#> Now using anchor version 0.31.1.
+# Verify anchor:
+anchor --version
+#> anchor-cli 0.31.1
+
+# Install Yarn:
+npm install --global yarn
+yarn --version
+#> 1.22.22
+```
+
+## Make the owner / upgrade authority account
+
+Make a default keypair to set the piggy bank contract authority, set it as default and then
+fund it:
+
+```shell
+solana-keygen new --no-bip39-passphrase
+#> Wrote new keypair to /home/someone/.config/solana/id.json
+#> =============================================================================
+#> pubkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#> =============================================================================
+#> Save this seed phrase to recover your new keypair:
+#> xxxx xxxxxxx xxxxxx xxxxxx xxxxxxx xxxxx xxxxx xxxx xxxxx xxxxxxxx xxxxx xxxx
+#> =============================================================================
+
+solana config set --url devnet
+#> Config File: /home/user/.config/solana/cli/config.yml
+#> RPC URL: https://api.devnet.solana.com
+#> WebSocket URL: wss://api.devnet.solana.com/ (computed)
+#> Keypair Path: /home/user/.config/solana/id.json
+#> Commitment: confirmed
+
+solana airdrop 2
+#> Requesting airdrop of 2 SOL
+#> 
+#> Signature: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#> 
+#> 2 SOL
+```
+
+## Install dependencies
+
+```shell
+npm install
+```
+
+## Generate a new account to host the program
+
+```shell
+solana-keygen new --no-bip39-passphrase --outfile target/deploy/piggybank-keypair.json
+#> Wrote new keypair to target/deploy/piggybank-keypair.json
+#> =============================================================================
+#> pubkey: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#> =============================================================================
+#> Save this seed phrase to recover your new keypair:
+#> xxxx xxxxxxx xxxxxx xxxxxx xxxxxxx xxxxx xxxxx xxxx xxxxx xxxxxxxx xxxxx xxxx
+#> =============================================================================
+```
+
+**Important**: the pubkey will be your program id.
+MAKE SURE TO BACKUP THIS INFO!
+
+## Customize the project files
+
+You need to edit some files:
+
+- `programs/piggybank/src/lib.rs`:
+  - At the top, set the pubkey you'll use.
+  - At the bottom, edit the `security_txt` macro.
+
+
+- `programs/piggybank/Cargo.toml`:
+  - Set a description that suits your needs.
+
+
+- `Anchor.toml`:
+  - On the `[programs.devnet]` section, set the `piggybank` value to the public key.
+  - On the `[provider]` section, set `cluster = "devnet"`
+
+## Build the project
+
+```shell
+anchor build
+#>   Compiling piggybank v0.0.1 (/home/user/piggybank/programs/piggybank)
+#>    Finished `release` profile [optimized] target(s) in 1.66s
+#>   Compiling piggybank v0.0.1 (/home/user/piggybank/programs/piggybank)
+#>    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.97s
+#>     Running unittests src/lib.rs (/home/user/piggybank/target/debug/deps/piggybank-ed23ef5af5b62355)
+```
+
+Deploy:
+
+```shell
+#> anchor deploy
+#> Deploying cluster: https://api.devnet.solana.com
+#> Upgrade authority: /home/piggybank/.config/solana/id.json
+#> Deploying program "piggybank"...
+#> Program path: /home/piggybank/target/deploy/piggybank.so...
+#> Program Id: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#> 
+#> Signature: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#> 
+#> Deploy success
+```
+
+SAVE the next items:
+- `.config/solana/id.json` file <-- Upgrade authority
+
+
+- `target/deploy/piggybank-keypair.json` file <-- Contract private key
+
+
+- Program Id from the output above (the pubkey of the piggybank keypair).
+
+You won't need them anywhere else, but if you lose them, you'll lose access
+to the piggy bank contract.
