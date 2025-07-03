@@ -9,8 +9,8 @@
  */
 
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Mint, Token, TokenAccount, Transfer};
-use anchor_spl::associated_token::get_associated_token_address; // You may need to add this dependency.
+use anchor_spl::token::{self, Token, TokenAccount, Mint, Transfer};
+use anchor_spl::associated_token::{self, AssociatedToken};
 use solana_security_txt::security_txt;
 
 // Note: put here the piggy bank's public key
@@ -20,71 +20,54 @@ declare_id!("VaU1t11111111111111111111111111111111111111");
 pub mod piggybank {
     use super::*;
 
-    pub fn withdraw(
-        ctx: Context<Withdraw>,
-        amount: u64,
-    ) -> Result<()> {
-        let signer = &ctx.accounts.signer;
-        let nft_mint = &ctx.accounts.nft_mint;
-        let token_mint = &ctx.accounts.token_mint;
-
-        // 1. Derive user's NFT token account (ATA)
-        let user_nft_ata = get_associated_token_address(&signer.key(), &nft_mint.key());
-
-        // 2. Confirm signer owns the NFT
-        let nft_account = &ctx.accounts.user_nft_account;
-        require!(
-            nft_account.owner == signer.key() && nft_account.amount == 1,
-            VaultError::NotNFTOwner
-        );
-        require!(
-            nft_account.mint == nft_mint.key(),
-            VaultError::NotNFTOwner
-        );
-
-        // 3. Derive vault authority PDA and vault token ATA
-        let (vault_authority, vault_bump) = Pubkey::find_program_address(
-            &[b"PoliCromixPiggyBankV2", nft_mint.key().as_ref()],
-            ctx.program_id,
-        );
-        require!(
-            vault_authority == ctx.accounts.vault_authority.key(),
-            VaultError::InvalidVaultAuthority
-        );
-        let vault_token_ata = get_associated_token_address(&vault_authority, &token_mint.key());
-        require!(
-            vault_token_ata == ctx.accounts.vault_token_account.key(),
-            VaultError::InvalidVaultAccount
-        );
-
-        // 4. Derive user's destination token ATA for fungible token
-        let user_token_ata = get_associated_token_address(&signer.key(), &token_mint.key());
-        require!(
-            user_token_ata == ctx.accounts.user_token_account.key(),
-            VaultError::InvalidDestination
-        );
-
-        // 5. Transfer tokens
-        let nft_mint_key = nft_mint.key();
-        let signer_seeds: &[&[u8]] = &[
+    pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+        // --- 1. Validate NFT ownership (SPL token with amount 1) ---
+        // Anchor constraints already check this!
+        
+        // --- 2. Create destination ATA for user if it doesn't exist ---
+        if ctx.accounts.user_token_ata.to_account_info().lamports() == 0 {
+            let cpi_accounts = associated_token::Create {
+                payer: ctx.accounts.signer.to_account_info(),
+                associated_token: ctx.accounts.user_token_ata.to_account_info(),
+                authority: ctx.accounts.signer.to_account_info(),
+                mint: ctx.accounts.token_mint.to_account_info(),
+                system_program: ctx.accounts.system_program.to_account_info(),
+                token_program: ctx.accounts.token_program.to_account_info(),
+            };
+            let cpi_ctx = CpiContext::new(
+                ctx.accounts.associated_token_program.to_account_info(),
+                cpi_accounts,
+            );
+            associated_token::create(cpi_ctx)?;
+        }
+        
+        // --- 3. Transfer SPL tokens from vault ATA to user ATA ---
+        let bump = ctx.bumps.vault;
+        let nft_mint_key = ctx.accounts.nft_mint.key();
+        let tkn_mint_key = ctx.accounts.token_mint.key();
+        let seeds = &[
             b"PoliCromixPiggyBankV2",
             nft_mint_key.as_ref(),
-            &[vault_bump],
+            tkn_mint_key.as_ref(),
+            &[ctx.bumps.vault],
         ];
+        
         let cpi_accounts = Transfer {
-            from: ctx.accounts.vault_token_account.to_account_info(),
-            to: ctx.accounts.user_token_account.to_account_info(),
-            authority: ctx.accounts.vault_authority.to_account_info(),
+            from: ctx.accounts.vault_token_ata.to_account_info(),
+            to: ctx.accounts.user_token_ata.to_account_info(),
+            authority: ctx.accounts.vault.to_account_info(),
         };
-        token::transfer(
-            CpiContext::new_with_signer(
-                ctx.accounts.token_program.to_account_info(),
-                cpi_accounts,
-                &[signer_seeds],
-            ),
-            amount,
-        )?;
-
+        
+        let signer_seeds: &[&[&[u8]]] = &[seeds];
+        
+        let cpi_ctx = CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            cpi_accounts,
+            signer_seeds,
+        );
+        
+        token::transfer(cpi_ctx, amount)?;
+        
         Ok(())
     }
 }
@@ -94,43 +77,42 @@ pub struct Withdraw<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
     
-    /// CHECK: User's NFT account (should be the NFT ATA)
-    #[account(mut)]
-    pub user_nft_account: Account<'info, TokenAccount>,
-    
-    /// CHECK: The NFT mint (input)
     pub nft_mint: Account<'info, Mint>,
-    
-    /// CHECK: The fungible token mint (input)
     pub token_mint: Account<'info, Mint>,
     
-    /// CHECK: User's destination ATA for the fungible token (derived inside, for require checks)
-    #[account(mut)]
-    pub user_token_account: Account<'info, TokenAccount>,
+    #[account(
+        constraint = nft_token_account.owner == signer.key(),
+        constraint = nft_token_account.mint == nft_mint.key(),
+        constraint = nft_token_account.amount == 1
+    )]
+    pub nft_token_account: Account<'info, TokenAccount>,
     
-    /// CHECK: Vault's SPL token account for this fungible token
-    #[account(mut)]
-    pub vault_token_account: Account<'info, TokenAccount>,
+    // --- Vault PDA ---
+    #[account(
+        seeds = [b"vault", nft_mint.key().as_ref(), token_mint.key().as_ref()],
+        bump
+    )]
+    pub vault: SystemAccount<'info>,
     
-    /// CHECK: PDA vault authority ("PoliCromixPiggyBankV2", nft_mint)
-    #[account(seeds = [b"PoliCromixPiggyBankV2", nft_mint.key().as_ref()], bump)]
-    pub vault_authority: AccountInfo<'info>,
+    // --- Vault's ATA for SPL token ---
+    #[account(
+        mut,
+        associated_token::mint = token_mint,
+        associated_token::authority = vault
+    )]
+    pub vault_token_ata: Account<'info, TokenAccount>,
     
-    /// CHECK: SPL Token program
+    // --- User's ATA for SPL token ---
+    #[account(
+        mut,
+        associated_token::mint = token_mint,
+        associated_token::authority = signer
+    )]
+    pub user_token_ata: Account<'info, TokenAccount>,
+    
     pub token_program: Program<'info, Token>,
-}
-
-// Vault errors extended for clarity
-#[error_code]
-pub enum VaultError {
-    #[msg("The sender does not own the NFT.")]
-    NotNFTOwner,
-    #[msg("Invalid vault authority.")]
-    InvalidVaultAuthority,
-    #[msg("Invalid vault account.")]
-    InvalidVaultAccount,
-    #[msg("Invalid destination ATA.")]
-    InvalidDestination,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
 }
 
 security_txt! {
