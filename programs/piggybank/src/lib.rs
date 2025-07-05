@@ -46,7 +46,7 @@ pub mod piggybank {
         let nft_mint_key = ctx.accounts.nft_mint.key();
         let tkn_mint_key = ctx.accounts.token_mint.key();
         let seeds = &[
-            b"PoliCromixPiggyBankV2",
+            b"PoliCromixPiggyBankV3",
             nft_mint_key.as_ref(),
             tkn_mint_key.as_ref(),
             &[ctx.bumps.vault],
@@ -89,7 +89,7 @@ pub struct Withdraw<'info> {
     
     // --- Vault PDA ---
     #[account(
-        seeds = [b"vault", nft_mint.key().as_ref(), token_mint.key().as_ref()],
+        seeds = [b"PoliCromixPiggyBankV3", nft_mint.key().as_ref(), token_mint.key().as_ref()],
         bump
     )]
     pub vault: SystemAccount<'info>,

@@ -69,8 +69,7 @@ yarn --version
 
 ## Make the owner / upgrade authority account
 
-Make a default keypair to set the piggy bank contract authority, set it as default and then
-fund it:
+Make a default keypair to set the piggy bank contract authority, set it as default and then  fund it:
 
 ```shell
 solana-keygen new --no-bip39-passphrase
@@ -89,13 +88,14 @@ solana config set --url devnet
 #> Keypair Path: /home/user/.config/solana/id.json
 #> Commitment: confirmed
 
-solana airdrop 2
-#> Requesting airdrop of 2 SOL
-#> 
+solana airdrop 5
+#> Requesting airdrop of 5 SOL
 #> Signature: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-#> 
-#> 2 SOL
+#> 5 SOL
 ```
+**Important**:
+
+- The pubkey will be the program authority. MAKE SURE TO BACKUP THIS INFO!
 
 ## Install dependencies
 
@@ -106,6 +106,7 @@ npm install
 ## Generate a new account to host the program
 
 ```shell
+mkdir -p target/deploy/
 solana-keygen new --no-bip39-passphrase --outfile target/deploy/piggybank-keypair.json
 #> Wrote new keypair to target/deploy/piggybank-keypair.json
 #> =============================================================================
@@ -116,15 +117,16 @@ solana-keygen new --no-bip39-passphrase --outfile target/deploy/piggybank-keypai
 #> =============================================================================
 ```
 
-**Important**: the pubkey will be your program id.
-MAKE SURE TO BACKUP THIS INFO!
+**Important**:
+
+- The pubkey will be the program id. MAKE SURE TO BACKUP THIS INFO!
 
 ## Customize the project files
 
 You need to edit some files:
 
 - `programs/piggybank/src/lib.rs`:
-  - At the top, set the pubkey you'll use.
+  - At the top, set **the program id** (pubkey from above).
   - At the bottom, edit the `security_txt` macro.
 
 
@@ -133,7 +135,8 @@ You need to edit some files:
 
 
 - `Anchor.toml`:
-  - On the `[programs.devnet]` section, set the `piggybank` value to the public key.
+  - On the `[programs.localnet]` section, set the `piggybank` value to **the program id**.
+  - On the `[programs.devnet]` section, set the `piggybank` value to **the program id**.
   - On the `[provider]` section, set `cluster = "devnet"`
 
 ## Build the project
@@ -170,6 +173,9 @@ SAVE the next items:
 
 
 - Program Id from the output above (the pubkey of the piggybank keypair).
+
+
+- `target/idl/piggybank.json` file <-- IDL for typescript stuff.
 
 You won't need them anywhere else, but if you lose them, you'll lose access
 to the piggy bank contract.
