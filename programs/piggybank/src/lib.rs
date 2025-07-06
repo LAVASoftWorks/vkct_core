@@ -73,19 +73,26 @@ pub mod piggybank {
 
 #[derive(Accounts)]
 pub struct Withdraw<'info> {
+
+    // --- [0] The NFT owner ---
     #[account(mut)]
     pub signer: Signer<'info>,
-    
+
+    // --- [1] The NFT itself ---
     pub nft_mint: Account<'info, Mint>,
+
+    // --- [2] The SPL token wanted to be taken out ---
     pub token_mint: Account<'info, Mint>,
-    
+
+    // --- [3] The user's ATA holding the NFT ---
     #[account(
-        constraint = nft_token_account.owner == signer.key(),
-        constraint = nft_token_account.mint == nft_mint.key(),
+        constraint = nft_token_account.owner  == signer.key(),
+        constraint = nft_token_account.mint   == nft_mint.key(),
         constraint = nft_token_account.amount == 1
     )]
     pub nft_token_account: Account<'info, TokenAccount>,
-    
+
+    // --- [4] Vault PDA ---
     /// CHECK: Vault PDA, derived by the provided string and the NFT pubkey that owns it.
     /// Only used as authority for token transfers. No data is read or written.
     #[account(
@@ -94,22 +101,23 @@ pub struct Withdraw<'info> {
     )]
     pub vault: UncheckedAccount<'info>,
     
-    // --- Vault's ATA for SPL token ---
+    // --- [5] Vault's ATA for SPL token ---
     #[account(
         mut,
-        associated_token::mint = token_mint,
+        associated_token::mint      = token_mint,
         associated_token::authority = vault
     )]
     pub vault_token_ata: Account<'info, TokenAccount>,
     
-    // --- User's ATA for SPL token ---
+    // --- [6] User's ATA for SPL token ---
     #[account(
         mut,
-        associated_token::mint = token_mint,
+        associated_token::mint      = token_mint,
         associated_token::authority = signer
     )]
     pub user_token_ata: Account<'info, TokenAccount>,
-    
+
+    // --- [7,8,9] Solana programs ---
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
