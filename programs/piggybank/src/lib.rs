@@ -46,9 +46,8 @@ pub mod piggybank {
         let nft_mint_key = ctx.accounts.nft_mint.key();
         let tkn_mint_key = ctx.accounts.token_mint.key();
         let seeds = &[
-            b"PoliCromixPiggyBankV3",
+            b"PoliCromixPiggyBankV4",
             nft_mint_key.as_ref(),
-            tkn_mint_key.as_ref(),
             &[ctx.bumps.vault],
         ];
         
@@ -87,12 +86,13 @@ pub struct Withdraw<'info> {
     )]
     pub nft_token_account: Account<'info, TokenAccount>,
     
-    // --- Vault PDA ---
+    /// CHECK: Vault PDA, derived by the provided string and the NFT pubkey that owns it.
+    /// Only used as authority for token transfers. No data is read or written.
     #[account(
-        seeds = [b"PoliCromixPiggyBankV3", nft_mint.key().as_ref(), token_mint.key().as_ref()],
+        seeds = [b"PoliCromixPiggyBankV4", nft_mint.key().as_ref()],
         bump
     )]
-    pub vault: SystemAccount<'info>,
+    pub vault: UncheckedAccount<'info>,
     
     // --- Vault's ATA for SPL token ---
     #[account(
