@@ -116,6 +116,15 @@ pub struct Withdraw<'info> {
 }
 
 security_txt! {
-   Contact: "security@example.com",
-   Acknowledgements: "https://example.com/security-acknowledgements"
+    // Required fields
+    name:        "Example",
+    project_url: "http://example.com",
+    contacts:    "email:example@example.com,link:https://example.com/security,discord:example#1234",
+    policy:      "https://github.com/solana-labs/solana/blob/master/SECURITY.md",
+
+    // Optional Fields
+    preferred_languages: "en",
+    source_code:         "https://github.com/example/example"
+    // auditors:            "None",
+    // acknowledgements:    ""
 }
