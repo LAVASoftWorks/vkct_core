@@ -110,8 +110,10 @@ pub struct Withdraw<'info> {
     pub vault_token_ata: Account<'info, TokenAccount>,
     
     // --- [6] User's ATA for SPL token ---
+    /// CHECK: Constraints on nft_user_account and vault are strictly set, avoiding re-initialization attacks.
     #[account(
-        mut,
+        init_if_needed,
+        payer = signer,
         associated_token::mint      = token_mint,
         associated_token::authority = signer
     )]
