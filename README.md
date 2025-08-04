@@ -179,3 +179,30 @@ SAVE the next items:
 
 You won't need them anywhere else, but if you lose them, you'll lose access
 to the piggy bank contract.
+
+## Customize the TypeScript helpers
+
+The TS files to initialize/add tokens/collections need to be customized.
+Please edit them before running them.
+
+## Initialize the valid SPL tokens registry and add tokens to it
+
+```shell
+# To initialize the registry (only once):
+ts-node init_token_registry.ts
+
+# To add a token to the registry:
+ts-node add_token_to_registry.ts "token_mint_address"
+```
+
+
+## Initialize the valid collections registry and add a collection to it
+
+```shell
+# To initialize the registry (only once):
+ts-node init_collection_registry.ts
+
+# Warning: make sure to mint a collection using the tokenizer and 
+# To add a collection to the registry:
+ts-node add_collection_to_registry.ts "collection_mint_address"
+```

@@ -1,6 +1,6 @@
 [package]
 name = "piggybank"
-version = "0.3.1"
+version = "0.5.0"
 description = "A vault for fungible tokens linked to NFT collections."
 edition = "2021"
 
