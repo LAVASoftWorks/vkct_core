@@ -1,5 +1,7 @@
 
-# Piggy bank setup
+# Volkachain Tokenizer Manager
+
+## Setup
 
 This needs to be done in a peak Ubuntu instance (24+).
 
@@ -203,6 +205,6 @@ ts-node add_token_to_registry.ts "token_mint_address"
 ts-node init_collection_registry.ts
 
 # Warning: make sure to mint a collection using the tokenizer and 
-# To add a collection to the registry:
+# to add a collection to the registry:
 ts-node add_collection_to_registry.ts "collection_mint_address"
 ```
