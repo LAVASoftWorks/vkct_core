@@ -5,7 +5,8 @@
 /**
  * Anchor-based Solana program for NFT vaults
  * 
- * Author: lava.caballero@gmail.com
+ * Author:  LAVA SoftWorks / Alejandro Caballero
+ * Website: https://lavasoftworks.com
  */
 
 use anchor_lang::prelude::*;
@@ -318,14 +319,14 @@ pub enum CustomError {
 
 security_txt! {
     // Required fields
-    name:        "Example",
-    project_url: "http://example.com",
-    contacts:    "email:example@example.com,link:https://example.com/security,discord:example#1234",
-    policy:      "https://github.com/solana-labs/solana/blob/master/SECURITY.md",
+    name:        "Volkachain Tokenizer Manager",
+    project_url: "https://volkachain.tech/tokenizer/manager",
+    contacts:    "email:alpha@volkachain.tech,link:https://volkachain.tech/contact,telegram:lavacaballero,twitter:lavacaballero,discord:lavacaballero",
+    policy:      "https://github.com/LAVASoftWorks/vkct_manager/blob/master/SECURITY.md",
 
     // Optional Fields
     preferred_languages: "en",
-    source_code:         "https://github.com/example/example"
-    // auditors:            "None",
-    // acknowledgements:    ""
+    source_code:         "https://github.com/LAVASoftWorks/vkct_manager"
+    // auditors:         "None",
+    // acknowledgements: ""
 }
