@@ -67,6 +67,10 @@ anchor --version
 npm install --global yarn
 yarn --version
 #> 1.22.22
+
+# Install ts-node for using the TS helpers:
+npm install --global ts-node
+#> added 20 packages in 2s
 ```
 
 ## Make the owner / upgrade authority account
@@ -107,6 +111,8 @@ npm install
 
 ## Generate a new account to host the program
 
+Note: this step isn't necessary, but it is highly recommended.
+
 ```shell
 mkdir -p target/deploy/
 solana-keygen new --no-bip39-passphrase --outfile target/deploy/piggybank-keypair.json
@@ -137,8 +143,6 @@ You need to edit some files:
 
 
 - `Anchor.toml`:
-  - On the `[programs.localnet]` section, set the `piggybank` value to **the program id**.
-  - On the `[programs.devnet]` section, set the `piggybank` value to **the program id**.
   - On the `[provider]` section, set `cluster = "devnet"`
 
 ## Build the project
