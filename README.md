@@ -33,7 +33,6 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
 nvm install stable --lts
 # Restart SSH session again
-
 ```
 
 Now install the Solana toolset
@@ -111,7 +110,7 @@ npm install
 
 ## Generate a new account to host the program
 
-Note: this step isn't necessary, but it is highly recommended.
+You'll need to create an account to host the program.
 
 ```shell
 mkdir -p target/deploy/
