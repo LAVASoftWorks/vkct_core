@@ -85,7 +85,17 @@ pub mod piggybank {
 
         Ok(())
     }
-    
+
+    // Pause/resume withdrawals
+
+    pub fn set_pause_withdrawals(ctx: Context<SetPauseWithdrawals>, paused: bool) -> Result<()> {
+
+        let reg = &mut ctx.accounts.registry;
+        require_keys_eq!(ctx.accounts.admin.key(), reg.admin, CustomError::Unauthorized);
+        reg.paused_withdrawals = paused;
+        Ok(())
+    }
+
     pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         
         let token_mint = ctx.accounts.token_mint.key();
@@ -93,6 +103,12 @@ pub mod piggybank {
 
         let collection_mint = ctx.accounts.collection_mint.key();
         let collection_registry = &ctx.accounts.collection_registry;
+
+        // --- 0. Check if withdrawals are available
+        require!(
+            !token_registry.paused_withdrawals,
+            CustomError::WithdrawalsPaused
+        );
 
         // --- 1. Check if the NFT we want to withdraw from is part of a valid collection.
 
@@ -186,6 +202,7 @@ pub mod piggybank {
 pub struct TokenRegistry {
     pub admin: Pubkey,
     pub allowed_mints: Vec<Pubkey>,
+    pub paused_withdrawals: bool,
 }
 
 #[derive(Accounts)]
@@ -193,7 +210,7 @@ pub struct InitializeRegistry<'info> {
     #[account(
         init,
         payer = admin,
-        space = 8 + 32 + (4 + MAX_ALLOWED_TOKENS * 32),
+        space = 8 + 32 + (4 + MAX_ALLOWED_TOKENS * 32) + 1,
         seeds = [SEED_TOKEN_REGISTRY],
         bump
     )]
@@ -244,6 +261,21 @@ pub struct AddCollection<'info> {
     )]
     pub collection_registry: Account<'info, CollectionRegistry>,
 
+    pub admin: Signer<'info>,
+}
+
+// Segment: Withdrawal pause switch
+
+#[derive(Accounts)]
+pub struct SetPauseWithdrawals<'info> {
+    #[account(
+        mut,
+        seeds = [SEED_TOKEN_REGISTRY],
+        bump
+    )]
+    pub registry: Account<'info, TokenRegistry>,
+
+    #[account(mut)]
     pub admin: Signer<'info>,
 }
 
@@ -352,6 +384,9 @@ pub enum CustomError {
 
     #[msg("NFT belongs to a different collection")]
     WrongCollection,
+
+    #[msg("Withdrawals are currently paused")]
+    WithdrawalsPaused,
 }
 
 security_txt! {
