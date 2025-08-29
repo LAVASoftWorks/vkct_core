@@ -13,6 +13,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Mint, Transfer};
 use anchor_spl::associated_token::{self, AssociatedToken};
 use solana_security_txt::security_txt;
+use mpl_token_metadata::accounts::Metadata as MetadataAccount;
 
 // Note: put here the piggy bank's public key
 declare_id!("VaU1t11111111111111111111111111111111111111");
@@ -92,7 +93,7 @@ pub mod piggybank {
 
         let collection_mint = ctx.accounts.collection_mint.key();
         let collection_registry = &ctx.accounts.collection_registry;
-        
+
         // --- 1. Check if the NFT we want to withdraw from is part of a valid collection.
 
         require!(
@@ -101,17 +102,37 @@ pub mod piggybank {
         );
 
         // --- 2. Check if the SPL token attempting to be withdrawn is in the valid tokens registry
-        
+
         require!(
             token_registry.allowed_mints.contains(&token_mint),
             CustomError::InvalidToken
         );
-        
+
         // --- 3. Validate NFT ownership (SPL token with amount 1) ---
-        
+
         // Anchor constraints already check this!
-        
-        // --- 4. Create destination ATA for user if it doesn't exist ---
+
+        // --- 4.1 Find the metadata PDA of the NFT
+        let (expected_md, _) = MetadataAccount::find_pda(&ctx.accounts.nft_mint.key());
+
+        require_keys_eq!(expected_md, ctx.accounts.nft_metadata.key(), CustomError::BadMetadataPda);
+
+        // --- 4.2 Safe deserialize the Metadata account using the v5 accounts API
+        let md = MetadataAccount::safe_deserialize(
+            &mut &ctx.accounts.nft_metadata.data.borrow()[..]
+        )?;
+
+        // --- 4.3 Enforce verified collection == your on-chain registry collection
+        let col = md.collection.ok_or(CustomError::MissingCollection)?;
+        require!(col.verified, CustomError::UnverifiedCollection);
+        // Use the collection mint you store on-chain (e.g., in your registry/collection_registry)
+            require_keys_eq!(
+            col.key,
+            collection_mint,
+            CustomError::WrongCollection
+        );
+
+        // --- 5. Create destination ATA for user if it doesn't exist ---
         
         if ctx.accounts.user_token_ata.to_account_info().lamports() == 0 {
             let cpi_accounts = associated_token::Create {
@@ -129,7 +150,7 @@ pub mod piggybank {
             associated_token::create(cpi_ctx)?;
         }
         
-        // --- 5. Transfer SPL tokens from vault ATA to user ATA ---
+        // --- 6. Transfer SPL tokens from vault ATA to user ATA ---
         let bump = ctx.bumps.vault;
         let nft_mint_key = ctx.accounts.nft_mint.key();
         let tkn_mint_key = ctx.accounts.token_mint.key();
@@ -291,7 +312,11 @@ pub struct Withdraw<'info> {
     )]
     pub user_token_ata: Account<'info, TokenAccount>,
 
-    // --- [10, 11, 12] Solana programs ---
+    // --- [10] NFT metadata PDA
+    /// CHECK: we validate PDA + contents in the handler
+    pub nft_metadata: UncheckedAccount<'info>,
+
+    // --- [11, 12, 13] Solana programs ---
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
@@ -315,6 +340,18 @@ pub enum CustomError {
 
     #[msg("The registry has reached maximum capacity.")]
     RegistryFull,
+
+    #[msg("Bad metadata PDA for the given mint")]
+    BadMetadataPda,
+
+    #[msg("NFT has no collection field")]
+    MissingCollection,
+
+    #[msg("NFT's collection is not verified")]
+    UnverifiedCollection,
+
+    #[msg("NFT belongs to a different collection")]
+    WrongCollection,
 }
 
 security_txt! {
