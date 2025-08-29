@@ -8,10 +8,11 @@
 import * as anchor from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import fs from "fs";
+import os from 'os';
 
 const REGISTRY_SEED         = "VkctPiggyBankV050tRegistry";
 const SOLANA_NETWORK_TARGET = "https://api.devnet.solana.com";
-const ADMIN_KEYPAIR_PATH    = ".config/solana/id.json";
+const ADMIN_KEYPAIR_PATH    = os.homedir() + "/.config/solana/id.json";
 const IDL_FILE_PATH         = "target/idl/piggybank.json";
 
 (async () => {
