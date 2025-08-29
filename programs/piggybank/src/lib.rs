@@ -393,7 +393,7 @@ security_txt! {
     // Required fields
     name:        "Volkachain Tokenizer Core",
     project_url: "https://volkachain.tech/tokenizer/core",
-    contacts:    "email:alpha@volkachain.tech,link:https://volkachain.tech/contact,telegram:lavacaballero,twitter:lavacaballero,discord:lavacaballero",
+    contacts:    "email:alpha@volkachain.tech,link:https://volkachain.tech/contact,twitter:LAVASoftWorks",
     policy:      "https://github.com/LAVASoftWorks/vkct_core/blob/master/SECURITY.md",
 
     // Optional Fields
