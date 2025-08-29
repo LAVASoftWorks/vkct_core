@@ -21,7 +21,7 @@ const SEED_VAULT:               &[u8] = b"VkctPiggyBankV050vaultSeed";
 const SEED_TOKEN_REGISTRY:      &[u8] = b"VkctPiggyBankV050tRegistry";
 const SEED_COLLECTION_REGISTRY: &[u8] = b"VkctPiggyBankV050cRegistry";
 
-const MAX_ALLOWED_TOKENS: usize = 256;
+const MAX_ALLOWED_TOKENS: usize = 1024;
 const MAX_COLLECTIONS:    usize = 256;
 
 #[program]
