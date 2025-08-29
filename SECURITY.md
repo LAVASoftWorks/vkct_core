@@ -1,4 +1,4 @@
 
-# Volkachain Tokenizer Manager Security Policy
+# Volkachain Tokenizer Core Security Policy
 
 TBD.

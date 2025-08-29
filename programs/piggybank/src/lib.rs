@@ -319,14 +319,14 @@ pub enum CustomError {
 
 security_txt! {
     // Required fields
-    name:        "Volkachain Tokenizer Manager",
-    project_url: "https://volkachain.tech/tokenizer/manager",
+    name:        "Volkachain Tokenizer Core",
+    project_url: "https://volkachain.tech/tokenizer/core",
     contacts:    "email:alpha@volkachain.tech,link:https://volkachain.tech/contact,telegram:lavacaballero,twitter:lavacaballero,discord:lavacaballero",
-    policy:      "https://github.com/LAVASoftWorks/vkct_manager/blob/master/SECURITY.md",
+    policy:      "https://github.com/LAVASoftWorks/vkct_core/blob/master/SECURITY.md",
 
     // Optional Fields
     preferred_languages: "en",
-    source_code:         "https://github.com/LAVASoftWorks/vkct_manager"
+    source_code:         "https://github.com/LAVASoftWorks/vkct_core"
     // auditors:         "None",
     // acknowledgements: ""
 }

@@ -1,5 +1,5 @@
 
-# Volkachain Tokenizer Manager
+# Volkachain Tokenizer Core
 
 ## Setup
 
@@ -143,6 +143,8 @@ You need to edit some files:
 
 
 - `Anchor.toml`:
+  - On the `[programs.localnet]` section, set the `piggybank` value to **the program id**.
+  - On the `[programs.devnet]` section, set the `piggybank` value to **the program id**.
   - On the `[provider]` section, set `cluster = "devnet"`
 
 ## Build the project
