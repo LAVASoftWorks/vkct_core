@@ -86,6 +86,12 @@ pub mod piggybank {
         Ok(())
     }
 
+    // Close collections registry: helper for resizing both registries.
+
+    pub fn close_collections_registry(_ctx: Context<CloseCollectionRegistry>) -> Result<()> {
+        Ok(())
+    }
+
     // Pause/resume withdrawals
 
     pub fn set_pause_withdrawals(ctx: Context<SetPauseWithdrawals>, paused: bool) -> Result<()> {
@@ -261,6 +267,21 @@ pub struct AddCollection<'info> {
     )]
     pub collection_registry: Account<'info, CollectionRegistry>,
 
+    pub admin: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct CloseCollectionRegistry<'info> {
+    #[account(
+        mut,
+        close = admin,
+        has_one = admin,
+        seeds = [SEED_COLLECTION_REGISTRY],
+        bump
+    )]
+    pub registry: Account<'info, CollectionRegistry>,
+
+    #[account(mut)]
     pub admin: Signer<'info>,
 }
 
