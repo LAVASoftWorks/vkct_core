@@ -6,13 +6,13 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-piggybank = "VaU1t11111111111111111111111111111111111111"
+piggybank = "LvPibsi1V7z71Nmqt3pnafDBgaoeMhiwNVDYMdYc2tG"
 
 [programs.devnet]
-piggybank = "VaU1t11111111111111111111111111111111111111"
+piggybank = "LvPibsi1V7z71Nmqt3pnafDBgaoeMhiwNVDYMdYc2tG"
 
 [programs.mainnet]
-piggybank = "VaU1t11111111111111111111111111111111111111"
+piggybank = "LvPibsi1V7z71Nmqt3pnafDBgaoeMhiwNVDYMdYc2tG"
 
 [registry]
 url = "https://api.apr.dev"

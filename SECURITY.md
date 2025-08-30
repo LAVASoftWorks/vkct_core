@@ -5,7 +5,7 @@
 
 This policy covers the Solana programs in this repo:
 
-- Program: `piggy_bank_v5` — Program ID: `VaU1t11111111111111111111111111111111111111`
+- Program: `piggybank` — Program ID: `LvPibsi1V7z71Nmqt3pnafDBgaoeMhiwNVDYMdYc2tG`
   Networks: mainnet-beta, testnet, devnet.
 
 Out of scope: marketing sites, docs, analytics, third-party wallets, RPC providers.
@@ -48,11 +48,13 @@ Contact us for more information.
 
 ## Emergency On-Chain Procedures
  
-- **Circuit breaker / Pause:** Maintained by authority `<authority_account>`.  
-  Used only to prevent active exploitation or protect user funds.
+- **Circuit breaker / Pause:** Maintained by authority
+  [LvAvGChA...GAMpaZA3](https://solscan.io/account/LvAvGChADF42u5ujjhk1HEd4Nxx8AfBq4QRGAMpaZA3).  
+  Used only *to prevent active exploitation* or protect user funds.
 
 
-- **Upgrade authority:** Held by `<authority_account>`.  
+- **Upgrade authority:** Held by
+  [LvAvGChA...GAMpaZA3](https://solscan.io/account/LvAvGChADF42u5ujjhk1HEd4Nxx8AfBq4QRGAMpaZA3).  
   Key rotation is logged in [CHANGELOG](CHANGELOG.md) and releases.
 
 

@@ -65,9 +65,9 @@ npm install --global ts-node
 #> added 20 packages in 2s
 ```
 
-## Make the owner / upgrade authority account
+## Make the admin / upgrade authority account
 
-Make a default keypair to set the piggy bank contract authority, set it as default and then  fund it:
+Make a default keypair to set the piggy bank contract authority, set it as default and then fund it:
 
 ```shell
 solana-keygen new --no-bip39-passphrase

@@ -16,11 +16,11 @@ use solana_security_txt::security_txt;
 use mpl_token_metadata::accounts::Metadata as MetadataAccount;
 
 // Note: put here the piggy bank's public key
-declare_id!("VaU1t11111111111111111111111111111111111111");
+declare_id!("LvPibsi1V7z71Nmqt3pnafDBgaoeMhiwNVDYMdYc2tG");
 
-const SEED_VAULT:               &[u8] = b"VkctPiggyBankV050vaultSeed";
-const SEED_TOKEN_REGISTRY:      &[u8] = b"VkctPiggyBankV050tRegistry";
-const SEED_COLLECTION_REGISTRY: &[u8] = b"VkctPiggyBankV050cRegistry";
+const SEED_VAULT:               &[u8] = b"VkctPiggyBankV100vaultSeed";
+const SEED_TOKEN_REGISTRY:      &[u8] = b"VkctPiggyBankV100tRegistry";
+const SEED_COLLECTION_REGISTRY: &[u8] = b"VkctPiggyBankV100cRegistry";
 
 const MAX_ALLOWED_TOKENS: usize = 1024;
 const MAX_COLLECTIONS:    usize = 256;
