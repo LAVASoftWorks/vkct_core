@@ -1,6 +1,6 @@
 [package]
 name = "piggybank"
-version = "1.0.0"
+version = "1.0.1"
 description = "A vault for fungible tokens linked to NFT collections using the Volkachain Tokenization Framework from LAVA SoftWorks."
 edition = "2021"
 

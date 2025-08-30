@@ -1030,7 +1030,7 @@ checksum = "e3148f5046208a5d56bcfc03053e3ca6334e51da8dfb19b6cdc8b306fae3283e"
 
 [[package]]
 name = "piggybank"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
