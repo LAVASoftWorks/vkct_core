@@ -23,7 +23,7 @@ const PAUSE_FLAG            = argv._[0] === 'true';
 const REGISTRY_KEY          = "VkctPiggyBankV100tRegistry";
 const IDL_FILE_PATH         = "target/idl/piggybank.json";
 const ADMIN_KEYPAIR_PATH    = os.homedir() + "/.config/solana/id.json";
-const SOLANA_NETWORK_TARGET = "https://api.devnet.solana.com";
+const SOLANA_NETWORK_TARGET = "https://api.mainnet-beta.solana.com";
 
 (async () => {
     // Load the admin keypair

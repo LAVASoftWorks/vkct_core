@@ -13,7 +13,7 @@ import os from 'os';
 const COLLECTION_REGISTRY_SEED = "VkctPiggyBankV100cRegistry";
 const ADMIN_KEYPAIR_PATH       = os.homedir() + "/.config/solana/id.json";
 const IDL_FILE_PATH            = "target/idl/piggybank.json";
-const SOLANA_NETWORK_TARGET    = "https://api.devnet.solana.com";
+const SOLANA_NETWORK_TARGET    = "https://api.mainnet-beta.solana.com";
 
 (async () => {
     // Load the admin keypair
