@@ -22,8 +22,8 @@ const SEED_VAULT:               &[u8] = b"VkctPiggyBankV100vaultSeed";
 const SEED_TOKEN_REGISTRY:      &[u8] = b"VkctPiggyBankV100tRegistry";
 const SEED_COLLECTION_REGISTRY: &[u8] = b"VkctPiggyBankV100cRegistry";
 
-const MAX_ALLOWED_TOKENS: usize = 1024;
-const MAX_COLLECTIONS:    usize = 256;
+const MAX_ALLOWED_TOKENS: usize = 256;
+const MAX_COLLECTIONS:    usize = 32;
 
 #[program]
 pub mod piggybank {
