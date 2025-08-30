@@ -2,7 +2,7 @@
  * Collection registry adder
  * Author: lava.caballero@gmail.com
  *
- * Usage: npm-ts add_collection_to_registry.ts <address>
+ * Usage: ts-node add_collection_to_registry.ts <address>
  */
 
 import * as anchor from "@coral-xyz/anchor";
